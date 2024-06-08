@@ -1,4 +1,4 @@
-# Sneak ORM
+## What is sneakyorm
 
 The project is a basic module, easily define your data models use decorator.
 
@@ -6,4 +6,4 @@ The project is a basic module, easily define your data models use decorator.
 
 - [sneakyorm/fetch](https://github.com/sneakyorm/fetch/README.md)
   
-  Sneak Fetch is a request library that using decorators to request data and transform the data to your defined Model.
+  is a request library that using decorators to request data and transform the data to your defined Model.

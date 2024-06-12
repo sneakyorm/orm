@@ -13,17 +13,19 @@ export class Model extends BaseModel {
 
   static create<T extends Model>(this: new () => T, data?: Partial<ModelFields<T>>) {
     const inst = new this()
-    assign(inst, (this as unknown as typeof Model).toInternalValue({ ...inst, ...data }))
+    for (const [name, field] of Object.entries((this as unknown as typeof Model).fields)) {
+      if ((inst as any)[name] === undefined) (inst as any)[name] = field.default
+    }
+    if (data) assign(inst, (this as unknown as typeof Model).toInternalValue(data))
     return inst
   }
 
   static toInternalValue(data: any): any {
     const obj: Record<string, any> = {}
     for (const [name, field] of Object.entries(this.fields)) {
+      console.log(data)
       let value = data[field.source ?? name]
-      if (value !== undefined) value = field.toInternalValue(value)
-      else value = field.default
-      obj[name] = value
+      if (value !== undefined) obj[name] = field.toInternalValue(value)
     }
     return obj
   }

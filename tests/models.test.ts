@@ -1,37 +1,14 @@
-import { Model, ModelSet, dateTimeField, integerField, modelField, stringField, useBranch } from "@/index"
-
-class InfoSet extends ModelSet<Info> {}
-
-@InfoSet.bind
-class Info extends Model {
-  @stringField()
-  name!: string
-}
-
-class User extends Model {
-  @stringField()
-  name!: string
-
-  @integerField()
-  age: number = 1
-
-  @stringField({ many: true })
-  addresses!: string[]
-
-  @modelField()
-  info!: InfoSet
-
-  @dateTimeField()
-  createdAt!: Date
-}
+import { ModelSet, useBranch } from "@/index"
+import { User } from "./models"
 
 test("Test Model", () => {
   const obj = User.create({ name: "Eugene Reese" })
+  console.log(obj)
 
   expect(obj.name).toEqual("Eugene Reese")
   expect(obj.toRepresentation()).toEqual({
     name: "Eugene Reese",
-    age: 1,
+    age: 999,
     addresses: [],
     info: [],
     createdAt: expect.any(String),

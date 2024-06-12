@@ -3,8 +3,6 @@ import { User } from "./models"
 
 test("Test Model", () => {
   const obj = User.create({ name: "Eugene Reese" })
-  console.log(obj)
-
   expect(obj.name).toEqual("Eugene Reese")
   expect(obj.toRepresentation()).toEqual({
     name: "Eugene Reese",

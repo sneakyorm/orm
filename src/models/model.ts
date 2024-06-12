@@ -23,7 +23,6 @@ export class Model extends BaseModel {
   static toInternalValue(data: any): any {
     const obj: Record<string, any> = {}
     for (const [name, field] of Object.entries(this.fields)) {
-      console.log(data)
       let value = data[field.source ?? name]
       if (value !== undefined) obj[name] = field.toInternalValue(value)
     }

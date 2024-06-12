@@ -1,6 +1,6 @@
 {
   "name": "sneakyorm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The project is a basic module, easily define your data models use decorator.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

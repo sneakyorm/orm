@@ -10,7 +10,7 @@ export function assign<T extends object | any[]>(target: T, source: any) {
   return target
 }
 
-export function merge<T extends Record<any, any>, B>(
+export function merge<T extends Record<any, any>, B = unknown>(
   target: Partial<T>,
   ...sources: (Partial<B> | undefined)[]
 ): T & B {

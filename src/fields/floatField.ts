@@ -1,4 +1,5 @@
 import { Validator } from "@/validators"
+import { fieldDecorator } from "./createFieldDecorator"
 import { Field, FieldOptions } from "./field"
 
 export class FloatField extends Field<number> {
@@ -9,6 +10,4 @@ export class FloatField extends Field<number> {
   }
 }
 
-export function floatField(options?: FieldOptions<number>) {
-  return FloatField.create(options).call
-}
+export const floatField = fieldDecorator<FieldOptions<number>>(FloatField)

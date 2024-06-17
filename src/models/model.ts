@@ -1,7 +1,16 @@
 import { Field } from "@/fields"
 import { assign } from "@/utils"
-import { BaseModel, ModelFields, ModelType, UnwrapFields } from "./baseModel"
+import { BaseModel, ModelType } from "./baseModel"
 import { ModelSet } from "./modelSet"
+
+export type UnwrapFields<T> = { [K in keyof T]: T[K] extends Field<infer Type> ? Type : T[K] }
+
+export type ModelFields<T> = Omit<
+  Pick<T, { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]>,
+  keyof BaseModel
+>
+
+export type ModelData<T extends Model> = Partial<ModelFields<T>> & Record<string, any>
 
 /**
  * Base class for all models.
@@ -11,7 +20,7 @@ export class Model extends BaseModel {
 
   declare errors?: Record<string, any>
 
-  static create<T extends Model>(this: new () => T, data?: Partial<ModelFields<T>>) {
+  static create<T extends Model>(this: new () => T, data?: ModelData<T>) {
     const inst = new this()
     for (const [name, field] of Object.entries((this as unknown as typeof Model).fields)) {
       if ((inst as any)[name] === undefined) (inst as any)[name] = field.default
@@ -89,12 +98,16 @@ export class Model extends BaseModel {
     return assign(this, (this.constructor as typeof Model).toInternalValue(data))
   }
 
-  static get Set() {
+  static get Set(): typeof ModelSet {
     const ModelClass = this
     class ItModelSet extends ModelSet {
       static model = ModelClass
     }
     Object.defineProperty(this, "Set", { value: ItModelSet })
-    return ItModelSet
+    return ItModelSet as typeof ModelSet
+  }
+
+  static set Set(value) {
+    Object.defineProperty(this, "Set", { value: value })
   }
 }

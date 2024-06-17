@@ -5,18 +5,18 @@ export class InfoSet extends ModelSet<Info> {}
 
 @InfoSet.bind
 export class Info extends Model {
-  @stringField()
+  @stringField
   name!: string
 }
 
 export class User extends Model {
-  @stringField()
+  @stringField
   name!: string
-  @integerField()
+  @integerField
   age: number = 999
   @stringField({ many: true })
   addresses!: string[]
-  @modelField()
+  @modelField
   info!: InfoSet
   @dateTimeField()
   createdAt!: Date

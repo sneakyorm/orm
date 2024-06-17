@@ -1,6 +1,9 @@
+import { Model } from "@/models"
 import { Serializer } from "@/serializers"
 import { ValidateErrorType, Validator, getError } from "@/validators"
 import "reflect-metadata"
+
+export type FieldType<T extends Field> = { new (): T; create: (options?: any) => T }
 
 export type FieldOptions<Type = any> = {
   source?: string
@@ -14,37 +17,36 @@ export type FieldOptions<Type = any> = {
 /**
  * Base class for all fields.
  */
-export class Field<Type = any> implements Serializer {
+export class Field<T = any> implements Serializer {
+  static fieldOptions?: FieldOptions
   static defaultValidators: Validator[] = []
 
   source?: string
   type?: any
-  validators?: Validator<Type>[]
+  validators?: Validator<T>[]
   nullable?: boolean
   readonly?: boolean
-
-  constructor(options?: FieldOptions<Type>) {
-    this.source = options?.source
-    this.validators = options?.validators
-    this.nullable = options?.nullable
-    this.readonly = options?.readonly
-  }
 
   /**
    * Creates a new instance of the specified field class and initializes it with the provided options.
    */
-  static create<T>(this: new (options?: FieldOptions<T>) => Field<T>, options?: FieldOptions<T>) {
-    let inst: Field = new this(options)
-    if (options?.many) {
-      inst = new ListField({ child: inst })
-    }
+  static create(this: new (options?: FieldOptions<any>) => Field<any>, options?: FieldOptions<any>) {
+    const inst: Field = new this(options)
+    inst.init(options)
+    if (options?.many) return ListField.create({ child: inst })
     return inst
   }
 
+  init(options?: FieldOptions<T>) {
+    this.source = options?.source ?? this.source
+    this.validators = options?.validators ?? this.validators
+    this.nullable = options?.nullable ?? this.nullable
+    this.readonly = options?.readonly ?? this.readonly
+  }
+
   get call() {
-    return (target: any, propertyKey: string) => {
-      if (!Object.keys(target.constructor).includes("fields")) target.constructor.fields = {}
-      if (propertyKey in target.constructor.fields) return
+    return (target: { constructor: typeof Model }, propertyKey: string) => {
+      if (!Object.prototype.hasOwnProperty.call(target.constructor, "fields")) target.constructor.fields = {}
       const type = Reflect.getMetadata("design:type", target, propertyKey)
       this.type = this.type || type
       this._validateType(this.type)
@@ -58,7 +60,7 @@ export class Field<Type = any> implements Serializer {
   /**
    * Converts the given data to its internal representation.
    */
-  toInternalValue(data: any): Type {
+  toInternalValue(data: any): T {
     return data
   }
 
@@ -83,23 +85,30 @@ export class Field<Type = any> implements Serializer {
     }
   }
 
-  get default(): Type {
-    return undefined as Type
+  get default(): T {
+    return undefined as T
   }
 }
+
+export type ListFieldOptions<T> = FieldOptions<T[]> & { child?: Field }
 
 /**
  * Base class for all list fields.
  */
-export class ListField<Type = any> extends Field<Type[]> {
+export class ListField<T = any> extends Field<T[]> {
   static defaultValidators: Validator[] = [(v) => Array.isArray(v) || "Must be an array"]
   static defaultChild: Field = new Field()
 
-  child: Field
+  child!: Field
 
-  constructor(options?: FieldOptions<Type[]> & { child: Field }) {
-    super(options)
-    this.child = options?.child || (this.constructor as typeof ListField).defaultChild
+  static create<T>(options?: ListFieldOptions<T>) {
+    const inst = new this()
+    inst.init(options)
+    return inst
+  }
+
+  init(options?: any): void {
+    this.child = options?.child ?? this.child ?? (this.constructor as typeof ListField).defaultChild
   }
 
   runValidators(value: any[]) {

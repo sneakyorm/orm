@@ -1,5 +1,6 @@
 import { Validator } from "@/validators"
 import { format as formatDate, toZonedTime } from "date-fns-tz"
+import { fieldDecorator } from "./createFieldDecorator"
 import { TimestampField, TimestampFieldOptions } from "./timestampField"
 
 export type DateTimeFieldOptions = TimestampFieldOptions & { format?: string }
@@ -9,10 +10,14 @@ export class DateTimeField extends TimestampField {
   static defaultFormat = "yyyy-MM-dd HH:mm:ss"
   static defaultTimeZone = TimestampField.defaultTimeZone
 
-  format: string
+  format!: string
 
-  constructor(options?: DateTimeFieldOptions) {
-    super(options)
+  static create(options?: DateTimeFieldOptions) {
+    return super.create(options)
+  }
+
+  init(options?: DateTimeFieldOptions) {
+    super.init(options)
     this.format = options?.format || (this.constructor as typeof DateTimeField).defaultFormat
   }
 
@@ -21,6 +26,6 @@ export class DateTimeField extends TimestampField {
   }
 }
 
-export function dateTimeField(options?: DateTimeFieldOptions) {
-  return DateTimeField.create(options).call
-}
+DateTimeField
+
+export const dateTimeField = fieldDecorator<DateTimeFieldOptions>(DateTimeField)

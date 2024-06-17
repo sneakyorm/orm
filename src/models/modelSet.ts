@@ -1,6 +1,7 @@
 import { assert_ok, throwError } from "@/errors"
 import { ValidateErrorType } from "@/validators"
 import { BaseModel, ModelType } from "./baseModel"
+import { Model } from "./model"
 
 export interface ArrayLike<T> {
   length: number
@@ -108,9 +109,9 @@ export class ModelSet<T extends BaseModel = BaseModel> extends BaseModel impleme
   }
 
   static get bind() {
-    return (target: any) => {
+    return (target: typeof Model) => {
       this.model = target
-      Object.defineProperty(target, "Set", { get: () => this })
+      target.Set = this
     }
   }
 

@@ -1,5 +1,5 @@
-import { ModelSet, useBranch } from "@/index"
-import { User } from "./models"
+import { ModelSet, StringField, useBranch } from "@/index"
+import { Info, InfoSet, User } from "./models"
 
 test("Test Model", () => {
   const obj = User.create({ name: "Eugene Reese" })
@@ -11,11 +11,15 @@ test("Test Model", () => {
     info: [],
     createdAt: expect.any(String),
   })
+
+  User.exclude("age").include({ abc: StringField.create() }).create()
 })
 
 test("Test Operation Hint", () => {
   expect(() => ModelSet.model).toThrow()
   expect(() => ModelSet.inst).toThrow()
+  expect(() => InfoSet.model).not.toThrow()
+  console.log(Info.Set)
 })
 
 test("Test useBranch", () => {

@@ -1,17 +1,9 @@
 import { NotImplementedError } from "@/errors"
-import { Field } from "@/fields"
 import { Serializer } from "@/serializers"
 import { assign } from "@/utils"
 
-export type UnwrapFields<T> = { [K in keyof T]: T[K] extends Field<infer Type> ? Type : T[K] }
-
-export type ModelFields<T> = Omit<
-  Pick<T, { [K in keyof T]: T[K] extends Function ? never : K }[keyof T]>,
-  keyof BaseModel
->
-
 export type ModelType<T = any, Base extends typeof BaseModel = typeof BaseModel> = Omit<Base, "create"> & {
-  new (data?: any): T
+  new (): T
   create: ((data?: any) => T) & Base["create"]
 } & Serializer
 

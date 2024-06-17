@@ -1,4 +1,5 @@
 import { Validator } from "@/validators"
+import { fieldDecorator } from "./createFieldDecorator"
 import { DateTimeField, DateTimeFieldOptions } from "./dateTimeField"
 
 export class DateField extends DateTimeField {
@@ -7,6 +8,4 @@ export class DateField extends DateTimeField {
   static defaultTimeZone = DateTimeField.defaultTimeZone
 }
 
-export function dateField(options?: DateTimeFieldOptions) {
-  return DateField.create(options).call
-}
+export const dateField = fieldDecorator<DateTimeFieldOptions>(DateField)

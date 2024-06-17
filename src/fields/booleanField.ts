@@ -1,4 +1,5 @@
 import { Validator } from "@/validators"
+import { fieldDecorator } from "./createFieldDecorator"
 import { Field, FieldOptions } from "./field"
 
 export class BooleanField extends Field<boolean> {
@@ -9,6 +10,4 @@ export class BooleanField extends Field<boolean> {
   }
 }
 
-export function booleanField(options?: FieldOptions<boolean>) {
-  return BooleanField.create(options).call
-}
+export const booleanField = fieldDecorator<FieldOptions<boolean>>(BooleanField)

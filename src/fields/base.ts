@@ -3,7 +3,10 @@ import { Serializer } from "@/serializers"
 import { ValidateErrorType, Validator, getError } from "@/validators"
 import "reflect-metadata"
 
-export type FieldType<T extends Field> = { new (): T; create: (options?: any) => T }
+export type FieldType<T extends Field, OptsT> = {
+  new (): T & { init: (options?: OptsT) => void }
+  create: (options?: any) => T
+}
 
 export type FieldOptions<Type = any> = {
   source?: string
@@ -12,6 +15,7 @@ export type FieldOptions<Type = any> = {
   nullable?: boolean
   readonly?: boolean
   many?: boolean
+  default?: () => Type
 }
 
 /**
@@ -42,20 +46,22 @@ export class Field<T = any> implements Serializer {
     this.validators = options?.validators ?? this.validators
     this.nullable = options?.nullable ?? this.nullable
     this.readonly = options?.readonly ?? this.readonly
+    if (options?.default) Object.defineProperty(this, "default", { get: options.default })
   }
 
   get call() {
     return (target: { constructor: typeof Model }, propertyKey: string) => {
       if (!Object.prototype.hasOwnProperty.call(target.constructor, "fields")) target.constructor.fields = {}
       const type = Reflect.getMetadata("design:type", target, propertyKey)
-      this.type = this.type || type
-      this._validateType(this.type)
+      this.type = this.processTypeClass(this.type || type)
       if (this.nullable === undefined) this.nullable = type === Object
       target.constructor.fields[propertyKey] = this
     }
   }
 
-  _validateType(type: any) {}
+  processTypeClass(type: any): any {
+    return type
+  }
 
   /**
    * Converts the given data to its internal representation.

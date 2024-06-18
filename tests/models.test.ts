@@ -12,7 +12,10 @@ test("Test Model", () => {
     createdAt: expect.any(String),
   })
 
-  User.exclude("age").include({ abc: StringField.create() }).create()
+  class NewUser extends User.exclude("info", "addresses", "createdAt").include({
+    abc: StringField.create({ default: () => "abc" }),
+  }) {}
+  expect(NewUser.create().toRepresentation()).toEqual({ name: "", age: 999, abc: "abc" })
 })
 
 test("Test Operation Hint", () => {

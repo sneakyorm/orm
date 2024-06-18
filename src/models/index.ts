@@ -1,3 +1,1 @@
-export * from "./baseModel"
-export * from "./model"
-export * from "./modelSet"
+export * from "./base"

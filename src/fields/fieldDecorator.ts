@@ -1,6 +1,6 @@
-import { Field, FieldType } from "./field"
+import { Field, FieldType } from "./base"
 
-export function fieldDecorator<OptsT, T extends Field = Field>(fieldType: FieldType<T>) {
+export function fieldDecorator<T extends Field, OptsT>(fieldType: FieldType<T, OptsT>) {
   function decorator(options?: OptsT): (target: any, propertyKey: string) => void
 
   function decorator(target: any, propertyKey: string): void
